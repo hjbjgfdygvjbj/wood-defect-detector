@@ -1,8 +1,6 @@
 import streamlit as st
 from ultralytics import YOLO
 from PIL import Image
-import numpy as np
-import cv2
 import tempfile
 import os
 import gdown
@@ -16,9 +14,9 @@ st.write("Upload ảnh gỗ để phát hiện các lỗi: Crack, Dead Knot, Liv
 def load_model():
     model_path = "best_v11m.pt"
     if not os.path.exists(model_path):
-        with st.spinner("Đang tải model..."):
+        with st.spinner("Đang tải model lần đầu, vui lòng chờ..."):
             gdown.download(
-                f"https://drive.google.com/uc?id=1qoBP_0Q6ggUPmO1wtGvVcSPK9N5uR0Vr",
+                "https://drive.google.com/uc?id=1qoBP_0Q6ggUPmO1wtGvVcSPK9N5uR0Vr",
                 model_path,
                 quiet=False
             )
@@ -40,8 +38,8 @@ if uploaded_file:
             results = model.predict(tmp.name, conf=conf)
             os.unlink(tmp.name)
 
-        result_img = results[0].plot()
-        result_img = cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB)
+        # Dùng PIL thay vì cv2
+        result_img = Image.fromarray(results[0].plot()[:, :, ::-1])
 
         st.image(result_img, caption="Kết quả phát hiện", use_column_width=True)
 
